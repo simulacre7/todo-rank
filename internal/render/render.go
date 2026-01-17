@@ -4,18 +4,11 @@ import (
 	"fmt"
 	"io"
 	"sort"
+
+	"github.com/simulacre7/todo-rank/internal/score"
 )
 
-type ScoredTodo struct {
-	Tag      string
-	Priority *int
-	Message  string
-	Path     string
-	Line     int
-
-	Score int
-	Level string
-}
+type ScoredTodo = score.ScoredTodo
 
 var levelOrder = []string{"P0", "P1", "P2", "P3"}
 

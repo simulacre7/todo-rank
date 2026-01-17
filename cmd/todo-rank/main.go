@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/simulacre7/todo-rank/internal/render"
 	"github.com/simulacre7/todo-rank/internal/scan"
 )
 
@@ -82,7 +83,25 @@ func run() error {
 		Tags:     splitCSV(*tags),
 	}
 
-	return scan.Run(opts)
+	results, err := scan.Run(opts)
+	if err != nil {
+		return err
+	}
+
+	// Determine output writer
+	var w *os.File
+	if *out == "" {
+		w = os.Stdout
+	} else {
+		f, err := os.Create(*out)
+		if err != nil {
+			return fmt.Errorf("failed to create output file: %w", err)
+		}
+		defer f.Close()
+		w = f
+	}
+
+	return render.Render(w, results, *format)
 }
 
 // splitCSV splits a comma-separated string into a slice.
