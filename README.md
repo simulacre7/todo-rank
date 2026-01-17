@@ -18,6 +18,40 @@ cd todo-rank
 go build -o todo-rank ./cmd/todo-rank
 ```
 
+### 쉘 Alias 설정 (선택)
+
+자주 사용하는 옵션을 alias로 등록하면 편리합니다.
+
+**Bash** (`~/.bashrc`):
+
+```bash
+alias tr='todo-rank'
+alias trp='todo-rank --min-score 80'  # P0, P1만 보기
+alias trmd='todo-rank --format md'    # Markdown 출력
+```
+
+**Zsh** (`~/.zshrc`):
+
+```bash
+alias tr='todo-rank'
+alias trp='todo-rank --min-score 80'
+alias trmd='todo-rank --format md'
+```
+
+**Fish** (`~/.config/fish/config.fish`):
+
+```fish
+alias tr 'todo-rank'
+alias trp 'todo-rank --min-score 80'
+alias trmd 'todo-rank --format md'
+```
+
+설정 후 쉘을 재시작하거나 `source` 명령어로 적용:
+
+```bash
+source ~/.zshrc  # 또는 ~/.bashrc
+```
+
 ## 사용법
 
 ### 기본 실행
