@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/todo-rank/internal/parse"
-	"github.com/todo-rank/internal/score"
+	"github.com/simulacre7/todo-rank/internal/parse"
+	"github.com/simulacre7/todo-rank/internal/score"
 )
 
 // Run executes the scan with the given options.

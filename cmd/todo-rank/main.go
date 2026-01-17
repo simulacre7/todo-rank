@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/todo-rank/internal/scan"
+	"github.com/simulacre7/todo-rank/internal/scan"
 )
 
 const (
