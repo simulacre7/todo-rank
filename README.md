@@ -10,6 +10,14 @@
 go install github.com/simulacre7/todo-rank/cmd/todo-rank@latest
 ```
 
+> **참고**: `go install`로 설치한 바이너리는 `$HOME/go/bin`에 위치합니다.
+> `command not found` 오류가 발생하면 PATH에 Go bin 디렉토리를 추가하세요.
+>
+> ```bash
+> # ~/.zshrc 또는 ~/.bashrc에 추가
+> export PATH="$HOME/go/bin:$PATH"
+> ```
+
 또는 소스에서 빌드:
 
 ```bash
