@@ -188,6 +188,9 @@ todo-rank/
 │   └── todo-rank/
 │       └── main.go          # CLI 진입점, 옵션 파싱
 ├── internal/
+│   ├── initialize/
+│   │   ├── init.go          # init 명령 로직
+│   │   └── templates/       # 에이전트 가이드 템플릿
 │   ├── parse/
 │   │   ├── parse.go         # TODO 주석 파싱 (정규식)
 │   │   └── parse_test.go    # 파서 테스트
@@ -211,6 +214,7 @@ todo-rank/
 | 모듈 | 책임 |
 |------|------|
 | `cmd/todo-rank` | CLI 옵션 파싱, 진입점 |
+| `internal/initialize` | init 명령, 에이전트 가이드 템플릿 |
 | `internal/parse` | 한 줄에서 TODO 정보 추출 |
 | `internal/scan` | 디렉토리 순회, 파일 읽기, 결과 수집 |
 | `internal/score` | 점수 계산, 레벨 산출 |
@@ -250,7 +254,24 @@ go run ./cmd/todo-rank
 
 ## AI 에이전트 지원
 
-AI 코딩 어시스턴트가 이 도구를 효과적으로 사용할 수 있도록 다음 문서를 제공합니다:
+AI 코딩 어시스턴트가 이 도구를 효과적으로 사용할 수 있도록 에이전트 가이드 파일을 제공합니다.
+
+### 프로젝트에 에이전트 가이드 추가
+
+```bash
+# 모든 에이전트 가이드 생성
+todo-rank init all
+
+# 특정 에이전트만
+todo-rank init claude   # CLAUDE.md
+todo-rank init cursor   # .cursorrules
+todo-rank init llms     # llms.txt
+
+# 기존 파일 덮어쓰기
+todo-rank init --force all
+```
+
+### 생성되는 파일
 
 | 파일 | 용도 |
 |------|------|

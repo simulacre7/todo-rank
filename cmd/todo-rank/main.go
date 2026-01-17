@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/simulacre7/todo-rank/internal/initialize"
 	"github.com/simulacre7/todo-rank/internal/render"
 	"github.com/simulacre7/todo-rank/internal/scan"
 )
@@ -26,13 +27,68 @@ func main() {
 }
 
 func run() error {
-	args := os.Args[1:]
-
-	// Handle "scan" subcommand: strip it if present
-	if len(args) > 0 && args[0] == "scan" {
-		args = args[1:]
+	if len(os.Args) < 2 {
+		return runScan(os.Args[1:])
 	}
 
+	switch os.Args[1] {
+	case "init":
+		return runInit(os.Args[2:])
+	case "scan":
+		return runScan(os.Args[2:])
+	default:
+		// No subcommand, treat as scan with flags
+		return runScan(os.Args[1:])
+	}
+}
+
+func runInit(args []string) error {
+	fs := flag.NewFlagSet("init", flag.ContinueOnError)
+	force := fs.Bool("force", false, "overwrite existing files")
+
+	fs.Usage = func() {
+		fmt.Fprintln(os.Stderr, "Usage: todo-rank init [--force] <agent-type>")
+		fmt.Fprintln(os.Stderr, "")
+		fmt.Fprintln(os.Stderr, "Agent types:")
+		fmt.Fprintln(os.Stderr, "  llms     Generate llms.txt")
+		fmt.Fprintln(os.Stderr, "  claude   Generate CLAUDE.md")
+		fmt.Fprintln(os.Stderr, "  cursor   Generate .cursorrules")
+		fmt.Fprintln(os.Stderr, "  all      Generate all files")
+		fmt.Fprintln(os.Stderr, "")
+		fmt.Fprintln(os.Stderr, "Flags:")
+		fs.PrintDefaults()
+	}
+
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	if fs.NArg() < 1 {
+		fs.Usage()
+		return fmt.Errorf("agent type required")
+	}
+
+	agentType := fs.Arg(0)
+
+	results, err := initialize.Run(agentType, *force)
+	if err != nil {
+		return err
+	}
+
+	for _, r := range results {
+		if r.Error != nil {
+			fmt.Fprintf(os.Stderr, "error: %s: %v\n", r.File, r.Error)
+		} else if r.Skipped {
+			fmt.Printf("skipped: %s (already exists, use --force to overwrite)\n", r.File)
+		} else if r.Created {
+			fmt.Printf("created: %s\n", r.File)
+		}
+	}
+
+	return nil
+}
+
+func runScan(args []string) error {
 	fs := flag.NewFlagSet("todo-rank", flag.ContinueOnError)
 
 	root := fs.String("root", defaultRoot, "scan start directory")

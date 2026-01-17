@@ -1,0 +1,60 @@
+# todo-rank
+
+> Scan TODOs. Rank what matters now.
+
+todo-rank is a CLI tool that scans codebases for TODO/FIXME/@next comments and ranks them by priority score.
+
+## Quick Usage
+
+```bash
+# Scan current directory
+todo-rank
+
+# Show only high priority (P0, P1)
+todo-rank --min-score 80
+
+# Output as markdown
+todo-rank --format md --out TODOs.md
+
+# Scan specific directory
+todo-rank --root ./src
+
+# Exclude directories
+todo-rank --ignore .git,node_modules,dist,vendor
+```
+
+## Options
+
+- `--root <path>` : Directory to scan (default: .)
+- `--ignore <csv>` : Directories to ignore (default: .git,node_modules,dist)
+- `--format <text|md>` : Output format (default: text)
+- `--out <path>` : Output file (default: stdout)
+- `--min-score <n>` : Minimum score filter (default: 0)
+- `--tags <csv>` : Tags to scan (default: TODO,FIXME,@next)
+
+## Scoring System
+
+Tags: FIXME (+100), TODO (+50), @next (+30)
+Priority: [P0] (+100), [P1] (+70), [P2] (+40), [P3] (+10)
+Path bonus: cmd/ or main.go (+20)
+Test penalty: *_test.* (-20)
+
+Levels: P0 (>=120), P1 (>=80), P2 (>=40), P3 (<40)
+
+## Supported Comment Formats
+
+```
+// TODO: message
+// TODO[P1]: message with priority
+// FIXME[P0]: urgent fix
+// @next: upcoming task
+# TODO: python style
+/* TODO: block comment */
+```
+
+## When to Use
+
+- Before starting a coding session: `todo-rank --min-score 80`
+- Generate actionable task list: `todo-rank --format md --out TODOs.md`
+- Focus on critical paths: `todo-rank --root ./cmd --min-score 120`
+- Review technical debt: `todo-rank --min-score 0`
