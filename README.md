@@ -199,6 +199,9 @@ todo-rank/
 │   └── render/
 │       └── render.go        # 출력 포맷팅 (text/md)
 ├── spec/                    # 설계 문서
+├── llms.txt                 # AI 에이전트용 가이드
+├── CLAUDE.md                # Claude Code 전용 가이드
+├── .cursorrules             # Cursor IDE 규칙
 ├── go.mod
 └── README.md
 ```
@@ -244,6 +247,29 @@ go run ./cmd/todo-rank
 2. 브랜치 생성 (`feature/xxx` 또는 `fix/xxx`)
 3. 변경사항 구현 및 테스트
 4. PR 생성
+
+## AI 에이전트 지원
+
+AI 코딩 어시스턴트가 이 도구를 효과적으로 사용할 수 있도록 다음 문서를 제공합니다:
+
+| 파일 | 용도 |
+|------|------|
+| `llms.txt` | LLM/AI 에이전트용 범용 가이드 |
+| `CLAUDE.md` | Claude Code 전용 사용 가이드 |
+| `.cursorrules` | Cursor IDE AI 어시스턴트용 규칙 |
+
+### AI 에이전트 권장 워크플로우
+
+```bash
+# 세션 시작 시 우선순위 확인
+todo-rank --min-score 80
+
+# 사용자에게 보여줄 태스크 리스트 생성
+todo-rank --format md
+
+# 특정 모듈 작업 전 관련 TODO 확인
+todo-rank --root ./path/to/module
+```
 
 ## 설계 철학
 
