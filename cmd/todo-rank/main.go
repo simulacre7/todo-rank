@@ -44,7 +44,7 @@ func run() error {
 
 func runInit(args []string) error {
 	fs := flag.NewFlagSet("init", flag.ContinueOnError)
-	force := fs.Bool("force", false, "overwrite existing files")
+	force := fs.Bool("force", false, "overwrite existing files (default: append)")
 
 	fs.Usage = func() {
 		fmt.Fprintln(os.Stderr, "Usage: todo-rank init [--force] <agent-type>")
@@ -54,6 +54,9 @@ func runInit(args []string) error {
 		fmt.Fprintln(os.Stderr, "  claude   Generate CLAUDE.md")
 		fmt.Fprintln(os.Stderr, "  cursor   Generate .cursorrules")
 		fmt.Fprintln(os.Stderr, "  all      Generate all files")
+		fmt.Fprintln(os.Stderr, "")
+		fmt.Fprintln(os.Stderr, "If file exists, content is appended by default.")
+		fmt.Fprintln(os.Stderr, "Use --force to overwrite instead.")
 		fmt.Fprintln(os.Stderr, "")
 		fmt.Fprintln(os.Stderr, "Flags:")
 		fs.PrintDefaults()
@@ -70,7 +73,12 @@ func runInit(args []string) error {
 
 	agentType := fs.Arg(0)
 
-	results, err := initialize.Run(agentType, *force)
+	mode := initialize.ModeAppend // default: append
+	if *force {
+		mode = initialize.ModeForce
+	}
+
+	results, err := initialize.Run(agentType, mode)
 	if err != nil {
 		return err
 	}
@@ -78,8 +86,8 @@ func runInit(args []string) error {
 	for _, r := range results {
 		if r.Error != nil {
 			fmt.Fprintf(os.Stderr, "error: %s: %v\n", r.File, r.Error)
-		} else if r.Skipped {
-			fmt.Printf("skipped: %s (already exists, use --force to overwrite)\n", r.File)
+		} else if r.Appended {
+			fmt.Printf("appended: %s\n", r.File)
 		} else if r.Created {
 			fmt.Printf("created: %s\n", r.File)
 		}

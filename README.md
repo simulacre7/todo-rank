@@ -259,7 +259,7 @@ AI 코딩 어시스턴트가 이 도구를 효과적으로 사용할 수 있도�
 ### 프로젝트에 에이전트 가이드 추가
 
 ```bash
-# 모든 에이전트 가이드 생성
+# 모든 에이전트 가이드 생성 (기존 파일이 있으면 내용 추가)
 todo-rank init all
 
 # 특정 에이전트만
@@ -267,7 +267,7 @@ todo-rank init claude   # CLAUDE.md
 todo-rank init cursor   # .cursorrules
 todo-rank init llms     # llms.txt
 
-# 기존 파일 덮어쓰기
+# 기존 파일 덮어쓰기 (append 대신 overwrite)
 todo-rank init --force all
 ```
 

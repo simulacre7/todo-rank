@@ -36,14 +36,23 @@ func IsValidAgentType(t string) bool {
 	return false
 }
 
+type WriteMode int
+
+const (
+	ModeSkip WriteMode = iota
+	ModeForce
+	ModeAppend
+)
+
 type InitResult struct {
-	File    string
-	Created bool
-	Skipped bool
-	Error   error
+	File     string
+	Created  bool
+	Appended bool
+	Skipped  bool
+	Error    error
 }
 
-func Run(agentType string, force bool) ([]InitResult, error) {
+func Run(agentType string, mode WriteMode) ([]InitResult, error) {
 	if !IsValidAgentType(agentType) {
 		return nil, fmt.Errorf("invalid agent type: %s (valid: llms, claude, cursor, all)", agentType)
 	}
@@ -52,32 +61,51 @@ func Run(agentType string, force bool) ([]InitResult, error) {
 
 	switch AgentType(agentType) {
 	case AgentLLMs:
-		results = append(results, writeFile("llms.txt", llmsTxt, force))
+		results = append(results, writeFile("llms.txt", llmsTxt, mode))
 	case AgentClaude:
-		results = append(results, writeFile("CLAUDE.md", claudeMd, force))
+		results = append(results, writeFile("CLAUDE.md", claudeMd, mode))
 	case AgentCursor:
-		results = append(results, writeFile(".cursorrules", cursorrules, force))
+		results = append(results, writeFile(".cursorrules", cursorrules, mode))
 	case AgentAll:
-		results = append(results, writeFile("llms.txt", llmsTxt, force))
-		results = append(results, writeFile("CLAUDE.md", claudeMd, force))
-		results = append(results, writeFile(".cursorrules", cursorrules, force))
+		results = append(results, writeFile("llms.txt", llmsTxt, mode))
+		results = append(results, writeFile("CLAUDE.md", claudeMd, mode))
+		results = append(results, writeFile(".cursorrules", cursorrules, mode))
 	}
 
 	return results, nil
 }
 
-func writeFile(filename, content string, force bool) InitResult {
+const appendSeparator = "\n\n# --- todo-rank agent guide (appended) ---\n\n"
+
+func writeFile(filename, content string, mode WriteMode) InitResult {
 	result := InitResult{File: filename}
 
 	path := filepath.Join(".", filename)
 
-	if !force {
-		if _, err := os.Stat(path); err == nil {
+	// Check if file exists
+	existingContent, err := os.ReadFile(path)
+	fileExists := err == nil
+
+	if fileExists {
+		switch mode {
+		case ModeSkip:
 			result.Skipped = true
 			return result
+		case ModeAppend:
+			// Append new content to existing
+			newContent := string(existingContent) + appendSeparator + content
+			if err := os.WriteFile(path, []byte(newContent), 0644); err != nil {
+				result.Error = err
+				return result
+			}
+			result.Appended = true
+			return result
+		case ModeForce:
+			// Fall through to overwrite
 		}
 	}
 
+	// Create or overwrite file
 	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
 		result.Error = err
 		return result
